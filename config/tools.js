@@ -8,7 +8,6 @@ module.exports = {
 			extend(true, baseConf || {}, extendObj),
 
 
-	getPath(...chunks) {
-		return path.join(variables.get("baseDir"), ...chunks);
-	}
+	getPath: (...chunks) =>
+		path.join(variables.get("baseDir"), ...chunks)
 };
