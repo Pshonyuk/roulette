@@ -4,70 +4,103 @@ import { WheelView } from "./WheelView";
 const wheelView = new WheelView({
     sections: [
         {
-            color: "red",
-            number: 2
+            fill: "#2a72c3",
+            text: "7"
         },
         {
-            color: "red",
-            number: 7
+            fill: "#56c83b",
+            text: "<tspan baseline-shift='-30%' font-size='0.6em'>&#215;</tspan>2"
         },
         {
-            color: "red",
-            number: 9
+            fill: "#3b3b3b",
+            text: "B"
         },
         {
-            color: "red",
-            number: 0
+            fill: "#fee365",
+            text: "1"
         },
         {
-            color: "red",
-            number: 4
+            fill: "#ac16c2",
+            text: "10"
         },
         {
-            color: "red",
-            number: 9
+            fill: "#ff4b26",
+            text: "16"
         },
         {
-            color: "red",
-            number: 8
+            fill: "#ff9631",
+            text: "2"
         },
         {
-            color: "red",
-            number: 4
+            fill: "#2a72c3",
+            text: "12"
         },
         {
-            color: "red",
-            number: 10
+            fill: "#56c83b",
+            text: "5"
         },
         {
-            color: "red",
-            number: 5
+            fill: "#ac16c2",
+            text: "R"
         },
         {
-            color: "red",
-            number: 3
+            fill: "#fee365",
+            text: "<tspan baseline-shift='-30%' font-size='0.6em'>&#215;</tspan>2"
         },
         {
-            color: "red",
-            number: 7
+            fill: "#56c83b",
+            text: "14"
         },
         {
-            color: "red",
-            number: 4
+            fill: "#ff9631",
+            text: "8"
         },
         {
-            color: "red",
-            number: 6
+            fill: "#2a72c3",
+            text: "0"
         },
         {
-            color: "red",
-            number: 1
+            fill: "#ff4b26",
+            text: "3"
         },
         {
-            color: "red",
-            number: 9
+            fill: "#ac16c2",
+            text: "17"
+        },
+        {
+            textFill: "#3b3b3b",
+            fill: "#fafafa",
+            text: "="
+        },
+        {
+            fill: "#56c83b",
+            text: "15"
+        },
+        {
+            fill: "#ff9631",
+            text: "13"
+        },
+        {
+            fill: "#2a72c3",
+            text: "6"
+        },
+        {
+            fill: "#ac16c2",
+            text: "4"
+        },
+        {
+            fill: "#fee365",
+            text: "18"
+        },
+        {
+            fill: "#ff4b26",
+            text: "9"
+        },
+        {
+            fill: "#ff9631",
+            text: "11"
         }
     ]
 });
 
-document.querySelector("body").appendChild(wheelView.element);
+document.querySelector(".wheel-view").appendChild(wheelView.element);
