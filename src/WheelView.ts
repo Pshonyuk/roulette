@@ -1,6 +1,6 @@
 import { SVG } from "./SVG";
 
-const
+const extend = require("extend"),
     hasOwn = Object.hasOwnProperty;
 
 interface IWheelViewSection {
@@ -33,16 +33,16 @@ export class WheelView implements IWheelViewOptions{
         return {
             sections: [],
             fill: "#fafbfd",
-            stroke: "rgba(0,0,0,.8)",
+            stroke: "rgba(0,0,0,.2)",
             wheelBorder: 1.5,
             sectionBorder: 0.02,
             innerRadius: 9.4,
             textGear: {
+                fill: "#fafafa",
                 count: 20,
                 radius: 4.5,
-                innerRadius: 4,
                 margin: 2,
-                fill: "#fafafa"
+                innerRadius: 4
             }
         }
     }
@@ -63,29 +63,33 @@ export class WheelView implements IWheelViewOptions{
     }
 
     private _readOptions(options: IWheelViewOptions): void {
-        const defaults = WheelView.defaults;
-        for(let optName in defaults){
-            if(hasOwn.call(defaults, optName)) {
-                this[optName] = options[optName] == null ? defaults[optName] : options[optName];
+        const defaults = WheelView.defaults,
+            cloneOptions = Object.create(null);
+
+        for(let optName in options){
+            if(hasOwn.call(options, optName) && defaults[optName] !== void(0)) {
+                cloneOptions[optName] = options[optName];
             }
         }
+
+        extend(true, this, defaults, cloneOptions);
     }
 
     private _createElement(): void {
         const { textGear, innerRadius, sectionBorder } = this,
-            svg: SVGElement = this._element = SVG.createSvg({
-                width: "100%",
-                height: "100%",
-                viewBox: "0 0 100 100"
-            }),
             [x0, y0] = [50, 50],
             sectionAngle: number = 4 * Math.PI / this.sections.length,
             radius: number = x0 - this.wheelBorder,
             textGearDistance: number = radius - textGear.radius - textGear.margin,
-            sectionOffset = {
+            sectionOffset: { left: number, right: number } = {
                 left: sectionBorder / 2 - sectionAngle / 4,
                 right: sectionBorder / 2 + sectionAngle / 4
-            };
+            },
+            svg: SVGElement = this._element = SVG.createSvg({
+                width: "100%",
+                height: "100%",
+                viewBox: "0 0 100 100"
+            });
 
         svg.appendChild(SVG.createCircle({
             cx: x0,
@@ -97,10 +101,12 @@ export class WheelView implements IWheelViewOptions{
         this.sections.forEach((section, i) => {
             const startAngle: number = (i * sectionAngle - Math.PI) / 2 + sectionOffset.left,
                 endAngle: number = ((i + 1) * sectionAngle - Math.PI) / 2 - sectionOffset.right,
-                middleAngle = startAngle + (endAngle - startAngle) / 2,
-                group: SVGGElement = <SVGGElement>SVG.createElement("g");
+                middleAngle: number = startAngle + (endAngle - startAngle) / 2,
+                xMiddle = x0 + textGearDistance * Math.cos(middleAngle),
+                yMiddle = y0 + textGearDistance * Math.sin(middleAngle),
+                group: SVGGElement = <SVGGElement> SVG.createElement("g");
 
-            group.appendChild(SVG.createCircleSection({
+            group.appendChild(SVG.createSection({
                 x0,
                 y0,
                 fill: section.fill,
@@ -111,18 +117,18 @@ export class WheelView implements IWheelViewOptions{
             }));
 
             group.appendChild(SVG.createGear((<any>Object).assign({}, textGear, {
-                x0: x0 + textGearDistance * Math.cos(middleAngle),
-                y0: y0 + textGearDistance * Math.sin(middleAngle),
+                x0: xMiddle,
+                y0: yMiddle,
                 fill: section.textFill || textGear.fill
             })));
 
-            group.appendChild(SVG.createText({
+            group.appendChild(SVG.createRotatedText({
                 text: section.text,
                 fill: section.fill,
                 angle: middleAngle + Math.PI / 2,
                 fontSize: Math.floor(textGear.innerRadius * 1.4),
-                x: x0 + textGearDistance * Math.cos(middleAngle),
-                y: y0 + textGearDistance * Math.sin(middleAngle)
+                x: xMiddle,
+                y: yMiddle
             }));
 
             svg.appendChild(group);
@@ -151,9 +157,10 @@ export class WheelView implements IWheelViewOptions{
         svg.appendChild( SVG.createCircle({
             cx: x0,
             cy: y0,
-            r: radius,
+            r: radius - 0.25,
             fill: "rgba(0,0,0,0)",
             "stroke-width": 0.5,
+            "stroke-dasharray": `11 1`,
             stroke: this.stroke
         }));
     }

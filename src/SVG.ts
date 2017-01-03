@@ -17,9 +17,10 @@ export module SVG {
 		fill?: string,
 		stroke?: string,
 		"stroke-width"?: string|number
+		"stroke-dasharray"?: string
 	}
 
-	interface  ISVGCircleSectionAttrs {
+	interface  ISVGSectionAttrs {
 		startAngle: number
 		endAngle: number
 		radius: number
@@ -38,7 +39,7 @@ export module SVG {
 		fill?: string
 	}
 
-	interface ISVGTextAttrs {
+	interface ISVGRotatedTextAttrs {
 		x: number,
 		y: number,
 		text: string,
@@ -78,7 +79,7 @@ export module SVG {
 		return <SVGCircleElement> createElement("circle", attrs);
 	}
 
-	export function createCircleSection(attrs: ISVGCircleSectionAttrs): SVGPathElement {
+	export function createSection(attrs: ISVGSectionAttrs): SVGPathElement {
 		const { startAngle, endAngle, radius, innerRadius } = attrs,
 			outer = {
 				x0: attrs.x0 + radius * Math.cos(startAngle),
@@ -125,7 +126,7 @@ export module SVG {
 		});
 	}
 
-	export function createText(attrs: ISVGTextAttrs): SVGTextElement {
+	export function createRotatedText(attrs: ISVGRotatedTextAttrs): SVGTextElement {
 		const svgTextEl: SVGTextElement = <SVGTextElement>createElement("text", {
 			x: 0,
 			y: 0,

@@ -156,7 +156,7 @@
 
 	"use strict";
 	var SVG_1 = __webpack_require__(2);
-	var hasOwn = Object.hasOwnProperty;
+	var extend = __webpack_require__(3), hasOwn = Object.hasOwnProperty;
 	var WheelView = (function () {
 	    function WheelView(options) {
 	        this._readOptions(options);
@@ -167,16 +167,16 @@
 	            return {
 	                sections: [],
 	                fill: "#fafbfd",
-	                stroke: "rgba(0,0,0,.8)",
+	                stroke: "rgba(0,0,0,.2)",
 	                wheelBorder: 1.5,
 	                sectionBorder: 0.02,
 	                innerRadius: 9.4,
 	                textGear: {
+	                    fill: "#fafafa",
 	                    count: 20,
 	                    radius: 4.5,
-	                    innerRadius: 4,
 	                    margin: 2,
-	                    fill: "#fafafa"
+	                    innerRadius: 4
 	                }
 	            };
 	        },
@@ -184,22 +184,23 @@
 	        configurable: true
 	    });
 	    WheelView.prototype._readOptions = function (options) {
-	        var defaults = WheelView.defaults;
-	        for (var optName in defaults) {
-	            if (hasOwn.call(defaults, optName)) {
-	                this[optName] = options[optName] == null ? defaults[optName] : options[optName];
+	        var defaults = WheelView.defaults, cloneOptions = Object.create(null);
+	        for (var optName in options) {
+	            if (hasOwn.call(options, optName) && defaults[optName] !== void (0)) {
+	                cloneOptions[optName] = options[optName];
 	            }
 	        }
+	        extend(true, this, defaults, cloneOptions);
 	    };
 	    WheelView.prototype._createElement = function () {
-	        var _a = this, textGear = _a.textGear, innerRadius = _a.innerRadius, sectionBorder = _a.sectionBorder, svg = this._element = SVG_1.SVG.createSvg({
+	        var _a = this, textGear = _a.textGear, innerRadius = _a.innerRadius, sectionBorder = _a.sectionBorder, _b = [50, 50], x0 = _b[0], y0 = _b[1], sectionAngle = 4 * Math.PI / this.sections.length, radius = x0 - this.wheelBorder, textGearDistance = radius - textGear.radius - textGear.margin, sectionOffset = {
+	            left: sectionBorder / 2 - sectionAngle / 4,
+	            right: sectionBorder / 2 + sectionAngle / 4
+	        }, svg = this._element = SVG_1.SVG.createSvg({
 	            width: "100%",
 	            height: "100%",
 	            viewBox: "0 0 100 100"
-	        }), _b = [50, 50], x0 = _b[0], y0 = _b[1], sectionAngle = 4 * Math.PI / this.sections.length, radius = x0 - this.wheelBorder, textGearDistance = radius - textGear.radius - textGear.margin, sectionOffset = {
-	            left: sectionBorder / 2 - sectionAngle / 4,
-	            right: sectionBorder / 2 + sectionAngle / 4
-	        };
+	        });
 	        svg.appendChild(SVG_1.SVG.createCircle({
 	            cx: x0,
 	            cy: y0,
@@ -207,8 +208,8 @@
 	            fill: this.fill
 	        }));
 	        this.sections.forEach(function (section, i) {
-	            var startAngle = (i * sectionAngle - Math.PI) / 2 + sectionOffset.left, endAngle = ((i + 1) * sectionAngle - Math.PI) / 2 - sectionOffset.right, middleAngle = startAngle + (endAngle - startAngle) / 2, group = SVG_1.SVG.createElement("g");
-	            group.appendChild(SVG_1.SVG.createCircleSection({
+	            var startAngle = (i * sectionAngle - Math.PI) / 2 + sectionOffset.left, endAngle = ((i + 1) * sectionAngle - Math.PI) / 2 - sectionOffset.right, middleAngle = startAngle + (endAngle - startAngle) / 2, xMiddle = x0 + textGearDistance * Math.cos(middleAngle), yMiddle = y0 + textGearDistance * Math.sin(middleAngle), group = SVG_1.SVG.createElement("g");
+	            group.appendChild(SVG_1.SVG.createSection({
 	                x0: x0,
 	                y0: y0,
 	                fill: section.fill,
@@ -218,17 +219,17 @@
 	                innerRadius: innerRadius
 	            }));
 	            group.appendChild(SVG_1.SVG.createGear(Object.assign({}, textGear, {
-	                x0: x0 + textGearDistance * Math.cos(middleAngle),
-	                y0: y0 + textGearDistance * Math.sin(middleAngle),
+	                x0: xMiddle,
+	                y0: yMiddle,
 	                fill: section.textFill || textGear.fill
 	            })));
-	            group.appendChild(SVG_1.SVG.createText({
+	            group.appendChild(SVG_1.SVG.createRotatedText({
 	                text: section.text,
 	                fill: section.fill,
 	                angle: middleAngle + Math.PI / 2,
 	                fontSize: Math.floor(textGear.innerRadius * 1.4),
-	                x: x0 + textGearDistance * Math.cos(middleAngle),
-	                y: y0 + textGearDistance * Math.sin(middleAngle)
+	                x: xMiddle,
+	                y: yMiddle
 	            }));
 	            svg.appendChild(group);
 	        });
@@ -253,9 +254,10 @@
 	        svg.appendChild(SVG_1.SVG.createCircle({
 	            cx: x0,
 	            cy: y0,
-	            r: radius,
+	            r: radius - 0.25,
 	            fill: "rgba(0,0,0,0)",
 	            "stroke-width": 0.5,
+	            "stroke-dasharray": "11 1",
 	            stroke: this.stroke
 	        }));
 	    };
@@ -313,7 +315,7 @@
 	        return createElement("circle", attrs);
 	    }
 	    SVG.createCircle = createCircle;
-	    function createCircleSection(attrs) {
+	    function createSection(attrs) {
 	        var startAngle = attrs.startAngle, endAngle = attrs.endAngle, radius = attrs.radius, innerRadius = attrs.innerRadius, outer = {
 	            x0: attrs.x0 + radius * Math.cos(startAngle),
 	            y0: attrs.y0 + radius * Math.sin(startAngle),
@@ -330,7 +332,7 @@
 	            fill: attrs.fill
 	        });
 	    }
-	    SVG.createCircleSection = createCircleSection;
+	    SVG.createSection = createSection;
 	    function createGear(attrs) {
 	        var x0 = attrs.x0, y0 = attrs.y0, radius = attrs.radius, innerRadius = attrs.innerRadius, sectionAngle = 2 * Math.PI / attrs.count;
 	        var points = "";
@@ -344,7 +346,7 @@
 	        });
 	    }
 	    SVG.createGear = createGear;
-	    function createText(attrs) {
+	    function createRotatedText(attrs) {
 	        var svgTextEl = createElement("text", {
 	            x: 0,
 	            y: 0,
@@ -359,8 +361,100 @@
 	        svgTextEl.innerHTML = attrs.text;
 	        return svgTextEl;
 	    }
-	    SVG.createText = createText;
+	    SVG.createRotatedText = createRotatedText;
 	})(SVG = exports.SVG || (exports.SVG = {}));
+
+
+/***/ },
+/* 3 */
+/***/ function(module, exports) {
+
+	'use strict';
+	
+	var hasOwn = Object.prototype.hasOwnProperty;
+	var toStr = Object.prototype.toString;
+	
+	var isArray = function isArray(arr) {
+		if (typeof Array.isArray === 'function') {
+			return Array.isArray(arr);
+		}
+	
+		return toStr.call(arr) === '[object Array]';
+	};
+	
+	var isPlainObject = function isPlainObject(obj) {
+		if (!obj || toStr.call(obj) !== '[object Object]') {
+			return false;
+		}
+	
+		var hasOwnConstructor = hasOwn.call(obj, 'constructor');
+		var hasIsPrototypeOf = obj.constructor && obj.constructor.prototype && hasOwn.call(obj.constructor.prototype, 'isPrototypeOf');
+		// Not own constructor property must be Object
+		if (obj.constructor && !hasOwnConstructor && !hasIsPrototypeOf) {
+			return false;
+		}
+	
+		// Own properties are enumerated firstly, so to speed up,
+		// if last one is own, then all properties are own.
+		var key;
+		for (key in obj) {/**/}
+	
+		return typeof key === 'undefined' || hasOwn.call(obj, key);
+	};
+	
+	module.exports = function extend() {
+		var options, name, src, copy, copyIsArray, clone,
+			target = arguments[0],
+			i = 1,
+			length = arguments.length,
+			deep = false;
+	
+		// Handle a deep copy situation
+		if (typeof target === 'boolean') {
+			deep = target;
+			target = arguments[1] || {};
+			// skip the boolean and the target
+			i = 2;
+		} else if ((typeof target !== 'object' && typeof target !== 'function') || target == null) {
+			target = {};
+		}
+	
+		for (; i < length; ++i) {
+			options = arguments[i];
+			// Only deal with non-null/undefined values
+			if (options != null) {
+				// Extend the base object
+				for (name in options) {
+					src = target[name];
+					copy = options[name];
+	
+					// Prevent never-ending loop
+					if (target !== copy) {
+						// Recurse if we're merging plain objects or arrays
+						if (deep && copy && (isPlainObject(copy) || (copyIsArray = isArray(copy)))) {
+							if (copyIsArray) {
+								copyIsArray = false;
+								clone = src && isArray(src) ? src : [];
+							} else {
+								clone = src && isPlainObject(src) ? src : {};
+							}
+	
+							// Never move original objects, clone them
+							target[name] = extend(deep, clone, copy);
+	
+						// Don't bring in undefined values
+						} else if (typeof copy !== 'undefined') {
+							target[name] = copy;
+						}
+					}
+				}
+			}
+		}
+	
+		// Return the modified object
+		return target;
+	};
+	
 
 
 /***/ }
