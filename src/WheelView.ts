@@ -3,13 +3,14 @@ import { SVG } from "./SVG";
 const extend = require("extend"),
     hasOwn = Object.hasOwnProperty;
 
-interface IWheelViewSection {
+
+export interface IWheelViewSection {
     textFill?: string;
     fill: string;
     text: string;
 }
 
-interface IWheelViewGear {
+export interface IWheelViewGear {
     count: number;
     radius: number;
     innerRadius: number;
@@ -17,24 +18,22 @@ interface IWheelViewGear {
     fill?: string;
 }
 
-interface IWheelViewOptions {
+export interface IWheelViewOptions {
     sections: IWheelViewSection[];
     fill?: string;
     gears?: [number, number][]
-    wheelBorder?: number;
-    sectionBorder?: number;
+    sectionMargin?: number;
     innerRadius?: number;
     textGear?: IWheelViewGear;
 }
 
 
-export class WheelView implements IWheelViewOptions{
+export class WheelView implements IWheelViewOptions {
     static get defaults(): IWheelViewOptions {
         return {
             sections: [],
             fill: "#fafbfd",
-            wheelBorder: 1.5,
-            sectionBorder: 0.03,
+            sectionMargin: 0.03,
             innerRadius: 9.4,
             gears: [
                 [35, 0.1],
@@ -55,8 +54,7 @@ export class WheelView implements IWheelViewOptions{
     public sections: IWheelViewSection[];
     public fill: string;
     public gears: [number, number][];
-    public wheelBorder: number;
-    public sectionBorder: number;
+    public sectionMargin: number;
     public innerRadius: number;
     public textGear: IWheelViewGear;
 
@@ -80,15 +78,15 @@ export class WheelView implements IWheelViewOptions{
     }
 
     private _createElement(): void {
-        const { textGear, innerRadius, sectionBorder } = this,
+        const { textGear, innerRadius, sectionMargin } = this,
             [x0, y0] = [50, 50],
-            radius: number = x0 - this.wheelBorder,
+            radius: number = 50,
             fontSize: number = Math.floor(textGear.innerRadius * 1.4),
             sectionAngle: number = 4 * Math.PI / this.sections.length,
             textGearDistance: number = radius - textGear.radius - textGear.margin,
             sectionOffset: { left: number, right: number } = {
-                left: sectionBorder / 2 - sectionAngle / 4,
-                right: sectionBorder / 2 + sectionAngle / 4
+                left: sectionMargin / 2 - sectionAngle / 4,
+                right: sectionMargin / 2 + sectionAngle / 4
             },
             svg: SVGElement = this._element = SVG.createSvg({
                 width: "100%",
@@ -96,15 +94,6 @@ export class WheelView implements IWheelViewOptions{
             });
 
         svg.setAttribute("viewBox", "0 0 100 100");
-        svg.appendChild(SVG.createCircle({
-            cx: x0,
-            cy: y0,
-            r: 50,
-            fill: this.fill,
-            stroke: "#000",
-            strokeWidth: 0.2,
-            strokeOpacity: 0.1
-        }));
 
         this.sections.forEach((section, i) => {
             const startAngle: number = (i * sectionAngle - Math.PI) / 2 + sectionOffset.left,
@@ -153,6 +142,18 @@ export class WheelView implements IWheelViewOptions{
                 fillOpacity: params[1]
             }));
         });
+
+        svg.appendChild(SVG.createInsetDropShadow());
+        svg.appendChild(SVG.createCircle({
+            cx: x0,
+            cy: y0,
+            r: innerRadius,
+            fill: this.fill,
+            filter: `url(#${ SVG.INSET_SHADOW_ID })`,
+            stroke: "#000",
+            strokeWidth: 0.2,
+            strokeOpacity: 0.2
+        }));
     }
 
     get element(): SVGElement {

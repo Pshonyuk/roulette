@@ -167,8 +167,7 @@
 	            return {
 	                sections: [],
 	                fill: "#fafbfd",
-	                wheelBorder: 1.5,
-	                sectionBorder: 0.03,
+	                sectionMargin: 0.03,
 	                innerRadius: 9.4,
 	                gears: [
 	                    [35, 0.1],
@@ -197,23 +196,14 @@
 	        extend(true, this, defaults, cloneOptions);
 	    };
 	    WheelView.prototype._createElement = function () {
-	        var _a = this, textGear = _a.textGear, innerRadius = _a.innerRadius, sectionBorder = _a.sectionBorder, _b = [50, 50], x0 = _b[0], y0 = _b[1], radius = x0 - this.wheelBorder, fontSize = Math.floor(textGear.innerRadius * 1.4), sectionAngle = 4 * Math.PI / this.sections.length, textGearDistance = radius - textGear.radius - textGear.margin, sectionOffset = {
-	            left: sectionBorder / 2 - sectionAngle / 4,
-	            right: sectionBorder / 2 + sectionAngle / 4
+	        var _a = this, textGear = _a.textGear, innerRadius = _a.innerRadius, sectionMargin = _a.sectionMargin, _b = [50, 50], x0 = _b[0], y0 = _b[1], radius = 50, fontSize = Math.floor(textGear.innerRadius * 1.4), sectionAngle = 4 * Math.PI / this.sections.length, textGearDistance = radius - textGear.radius - textGear.margin, sectionOffset = {
+	            left: sectionMargin / 2 - sectionAngle / 4,
+	            right: sectionMargin / 2 + sectionAngle / 4
 	        }, svg = this._element = SVG_1.SVG.createSvg({
 	            width: "100%",
 	            height: "100%"
 	        });
 	        svg.setAttribute("viewBox", "0 0 100 100");
-	        svg.appendChild(SVG_1.SVG.createCircle({
-	            cx: x0,
-	            cy: y0,
-	            r: 50,
-	            fill: this.fill,
-	            stroke: "#000",
-	            strokeWidth: 0.2,
-	            strokeOpacity: 0.1
-	        }));
 	        this.sections.forEach(function (section, i) {
 	            var startAngle = (i * sectionAngle - Math.PI) / 2 + sectionOffset.left, endAngle = ((i + 1) * sectionAngle - Math.PI) / 2 - sectionOffset.right, middleAngle = startAngle + (endAngle - startAngle) / 2, xMiddle = x0 + textGearDistance * Math.cos(middleAngle), yMiddle = y0 + textGearDistance * Math.sin(middleAngle), group = SVG_1.SVG.createElement("g");
 	            group.appendChild(SVG_1.SVG.createSection({
@@ -251,6 +241,17 @@
 	                fillOpacity: params[1]
 	            }));
 	        });
+	        svg.appendChild(SVG_1.SVG.createInsetDropShadow());
+	        svg.appendChild(SVG_1.SVG.createCircle({
+	            cx: x0,
+	            cy: y0,
+	            r: innerRadius,
+	            fill: this.fill,
+	            filter: "url(#" + SVG_1.SVG.INSET_SHADOW_ID + ")",
+	            stroke: "#000",
+	            strokeWidth: 0.2,
+	            strokeOpacity: 0.2
+	        }));
 	    };
 	    Object.defineProperty(WheelView.prototype, "element", {
 	        get: function () {
@@ -282,6 +283,7 @@
 	        });
 	    };
 	    toDash.regex = /([A-Z])/g;
+	    SVG.INSET_SHADOW_ID = "inset-shadow";
 	    function createElement(type, attrs) {
 	        var svgEl = document.createElementNS(SVG_NS, type);
 	        setAttributes(svgEl, attrs);
@@ -359,6 +361,12 @@
 	        return svgTextEl;
 	    }
 	    SVG.createRotatedText = createRotatedText;
+	    function createInsetDropShadow(attrs) {
+	        var svgDefsEl = createElement("defs");
+	        svgDefsEl.innerHTML = "\n\t\t\t<filter id=\"" + SVG.INSET_SHADOW_ID + "\" x=\"-50%\" y=\"-50%\" width=\"200%\" height=\"200%\">\n\t\t\t\t<feComponentTransfer in=SourceAlpha>\n\t\t\t\t\t<feFuncA type=\"table\" tableValues=\"1 0\" />\n\t\t\t\t</feComponentTransfer>\n\t\t\t\t<feGaussianBlur stdDeviation=\"3\"/>\n\t\t\t\t<feOffset dx=\"-5\" dy=\"-5\" result=\"offsetblur\"/>\n\t\t\t\t<feFlood flood-color=\"rgba(20, 0, 0, .4)\" result=\"color\"/>\n\t\t\t\t<feComposite in2=\"offsetblur\" operator=\"in\"/>\n\t\t\t\t<feComposite in2=\"SourceAlpha\" operator=\"in\" />\n\t\t\t\t<feMerge>\n\t\t\t\t\t<feMergeNode in=\"SourceGraphic\" />\n\t\t\t\t\t<feMergeNode />\n\t\t\t\t</feMerge>\n\t\t\t</filter>\n\t\t";
+	        return svgDefsEl;
+	    }
+	    SVG.createInsetDropShadow = createInsetDropShadow;
 	})(SVG = exports.SVG || (exports.SVG = {}));
 
 

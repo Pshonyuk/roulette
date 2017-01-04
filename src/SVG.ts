@@ -4,58 +4,10 @@ const SVG_NS = "http://www.w3.org/2000/svg",
 
 
 export module SVG {
-	interface ISVGElementAttrs {
-		width: string|number;
-		height: string|number;
-		viewBox?: string;
-	}
-
-	interface  ISVGCircleAttrs {
-		r: number|string;
-		cx: number|string;
-		cy: number|string;
-		fill?: string;
-		stroke?: string;
-		strokeWidth?: string|number;
-		strokeOpacity?: string|number;
-	}
-
-	interface  ISVGSectionAttrs {
-		x0: number;
-		y0: number;
-		fill?: string;
-		stroke?: string;
-		radius: number;
-		endAngle: number;
-		startAngle: number;
-		innerRadius: number;
-		strokeWidth?: string|number;
-	}
-
-	interface ISVGGearAttrs {
-		x0: number;
-		y0: number;
-		fill?: string;
-		count: number;
-		radius: number;
-		innerRadius: number;
-		fillOpacity?: number|string;
-	}
-
-	interface ISVGRotatedTextAttrs {
-		x: number;
-		y: number;
-		text: string;
-		fill?: string;
-		angle: number;
-		fontSize?: number|string;
-	}
-
 	interface IToDash {
 		(str: string): string;
 		regex: RegExp;
 	}
-
 
 	let toDash = <IToDash> function(str: string): string {
 		return str.replace(toDash.regex, (match) =>
@@ -64,6 +16,57 @@ export module SVG {
 	};
 	toDash.regex = /([A-Z])/g;
 
+
+	export interface ISVGElementAttrs {
+		width: string | number;
+		height: string | number;
+		viewBox?: string;
+	}
+
+	export interface  ISVGCircleAttrs {
+		r: number | string;
+		cx: number | string;
+		cy: number | string;
+		fill?: string;
+		filter?: string;
+		stroke?: string;
+		strokeWidth?: string | number;
+		strokeOpacity?: string | number;
+	}
+
+	export interface  ISVGSectionAttrs {
+		x0: number;
+		y0: number;
+		fill?: string;
+		stroke?: string;
+		radius: number;
+		endAngle: number;
+		startAngle: number;
+		innerRadius: number;
+		strokeWidth?: string | number;
+	}
+
+	export interface ISVGGearAttrs {
+		x0: number;
+		y0: number;
+		fill?: string;
+		count: number;
+		radius: number;
+		innerRadius: number;
+		fillOpacity?: number | string;
+	}
+
+	export interface ISVGRotatedTextAttrs {
+		x: number;
+		y: number;
+		text: string;
+		fill?: string;
+		angle: number;
+		fontSize?: number | string;
+	}
+
+
+	export const INSET_SHADOW_ID: string = "inset-shadow";
 
 	export function createElement (type: string, attrs?:any): SVGElement {
 		const svgEl: SVGElement = <SVGElement> document.createElementNS(SVG_NS, type);
@@ -157,5 +160,26 @@ export module SVG {
 
 		svgTextEl.innerHTML = attrs.text;
 		return svgTextEl;
+	}
+
+	export function createInsetDropShadow(attrs?: any): SVGDefsElement {
+		const svgDefsEl: SVGDefsElement = <SVGDefsElement> createElement("defs");
+		svgDefsEl.innerHTML = `
+			<filter id="${ INSET_SHADOW_ID }" x="-50%" y="-50%" width="200%" height="200%">
+				<feComponentTransfer in=SourceAlpha>
+					<feFuncA type="table" tableValues="1 0" />
+				</feComponentTransfer>
+				<feGaussianBlur stdDeviation="3"/>
+				<feOffset dx="-5" dy="-5" result="offsetblur"/>
+				<feFlood flood-color="rgba(20, 0, 0, .4)" result="color"/>
+				<feComposite in2="offsetblur" operator="in"/>
+				<feComposite in2="SourceAlpha" operator="in" />
+				<feMerge>
+					<feMergeNode in="SourceGraphic" />
+					<feMergeNode />
+				</feMerge>
+			</filter>
+		`;
+		return svgDefsEl;
 	}
 }
