@@ -3,7 +3,7 @@ var webpack = require("webpack"),
 
 module.exports = require("./tools").extendConfig({
 	output: {
-		filename: `${ variables.get("outputFileName") }.min.js`
+		filename: "[name].min.js"
 	},
 
 	plugins: [

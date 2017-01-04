@@ -44,7 +44,14 @@
 /* 0 */
 /***/ function(module, exports, __webpack_require__) {
 
-	module.exports = __webpack_require__(1);
+	"use strict";
+	var wheel_fortune_1 = __webpack_require__(1);
+	new wheel_fortune_1.WheelFortune({
+	    container: document.querySelector(".app"),
+	    wheelView: {
+	        sections: __webpack_require__(3)
+	    }
+	});
 
 
 /***/ },
@@ -113,7 +120,110 @@
 
 
 /***/ },
-/* 3 */,
+/* 3 */
+/***/ function(module, exports) {
+
+	module.exports = [
+		{
+			"fill": "#2a72c3",
+			"text": "7"
+		},
+		{
+			"fill": "#56c83b",
+			"text": "<tspan baseline-shift='-30%' font-size='0.6em'>&#215;</tspan>2"
+		},
+		{
+			"fill": "#3b3b3b",
+			"text": "B"
+		},
+		{
+			"fill": "#fee365",
+			"text": "1"
+		},
+		{
+			"fill": "#ac16c2",
+			"text": "10"
+		},
+		{
+			"fill": "#ff4b26",
+			"text": "16"
+		},
+		{
+			"fill": "#ff9631",
+			"text": "2"
+		},
+		{
+			"fill": "#2a72c3",
+			"text": "12"
+		},
+		{
+			"fill": "#56c83b",
+			"text": "5"
+		},
+		{
+			"fill": "#ac16c2",
+			"text": "R"
+		},
+		{
+			"fill": "#fee365",
+			"text": "<tspan baseline-shift='-30%' font-size='0.6em'>&#215;</tspan>2"
+		},
+		{
+			"fill": "#56c83b",
+			"text": "14"
+		},
+		{
+			"fill": "#ff9631",
+			"text": "8"
+		},
+		{
+			"fill": "#2a72c3",
+			"text": "0"
+		},
+		{
+			"fill": "#ff4b26",
+			"text": "3"
+		},
+		{
+			"fill": "#ac16c2",
+			"text": "17"
+		},
+		{
+			"textFill": "#3b3b3b",
+			"fill": "#fafafa",
+			"text": "="
+		},
+		{
+			"fill": "#56c83b",
+			"text": "15"
+		},
+		{
+			"fill": "#ff9631",
+			"text": "13"
+		},
+		{
+			"fill": "#2a72c3",
+			"text": "6"
+		},
+		{
+			"fill": "#ac16c2",
+			"text": "4"
+		},
+		{
+			"fill": "#fee365",
+			"text": "18"
+		},
+		{
+			"fill": "#ff4b26",
+			"text": "9"
+		},
+		{
+			"fill": "#ff9631",
+			"text": "11"
+		}
+	];
+
+/***/ },
 /* 4 */
 /***/ function(module, exports, __webpack_require__) {
 
@@ -427,4 +537,4 @@
 
 /***/ }
 /******/ ]);
-//# sourceMappingURL=WheelFortune.js.map
+//# sourceMappingURL=main.js.map
