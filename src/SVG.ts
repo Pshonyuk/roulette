@@ -5,48 +5,64 @@ const SVG_NS = "http://www.w3.org/2000/svg",
 
 export module SVG {
 	interface ISVGElementAttrs {
-		width: string|number,
-		height: string|number,
-		viewBox?: string
+		width: string|number;
+		height: string|number;
+		viewBox?: string;
 	}
 
 	interface  ISVGCircleAttrs {
-		r: number|string,
-		cx: number|string,
-		cy: number|string,
-		fill?: string,
-		stroke?: string,
-		"stroke-width"?: string|number
-		"stroke-dasharray"?: string
+		r: number|string;
+		cx: number|string;
+		cy: number|string;
+		fill?: string;
+		stroke?: string;
+		strokeWidth?: string|number;
+		strokeOpacity?: string|number;
 	}
 
 	interface  ISVGSectionAttrs {
-		startAngle: number
-		endAngle: number
-		radius: number
-		innerRadius: number,
-		x0: number,
-		y0: number,
-		fill?: string
+		x0: number;
+		y0: number;
+		fill?: string;
+		stroke?: string;
+		radius: number;
+		endAngle: number;
+		startAngle: number;
+		innerRadius: number;
+		strokeWidth?: string|number;
 	}
 
 	interface ISVGGearAttrs {
-		x0: number,
-		y0: number,
-		count: number,
-		radius: number,
-		innerRadius: number,
-		fill?: string
+		x0: number;
+		y0: number;
+		fill?: string;
+		count: number;
+		radius: number;
+		innerRadius: number;
+		fillOpacity?: number|string;
 	}
 
 	interface ISVGRotatedTextAttrs {
-		x: number,
-		y: number,
-		text: string,
-		fill?: string
-		angle: number,
-		fontSize?: number|string
+		x: number;
+		y: number;
+		text: string;
+		fill?: string;
+		angle: number;
+		fontSize?: number|string;
 	}
+
+	interface IToDash {
+		(str: string): string;
+		regex: RegExp;
+	}
+
+
+	let toDash = <IToDash> function(str: string): string {
+		return str.replace(toDash.regex, (match) =>
+			`-${match.toLowerCase()}`
+		)
+	};
+	toDash.regex = /([A-Z])/g;
 
 
 	export function createElement (type: string, attrs?:any): SVGElement {
@@ -63,9 +79,9 @@ export module SVG {
 				let attrVal = "" + attrs[attrName];
 
 				if(attrName.toLowerCase() === "href") {
-					el.setAttributeNS(XLINK, attrName, attrVal);
+					el.setAttributeNS(XLINK, toDash(attrName), attrVal);
 				} else {
-					el.setAttribute(attrName, attrVal);
+					el.setAttribute(toDash(attrName), attrVal);
 				}
 			}
 		}
@@ -102,12 +118,15 @@ export module SVG {
 				L ${outer.x1} ${outer.y1}
 				A ${radius} ${radius} 0 0 0 ${outer.x0} ${outer.y0} Z
 			`,
-			fill: attrs.fill
+			fill: attrs.fill,
+			stroke: attrs.fill,
+			strokeWidth: "0.6",
+			strokeOpacity: "0.6"
 		});
 	}
 
-	export function createGear(attrs?: ISVGGearAttrs): SVGPolygonElement{
-		const { x0, y0, radius, innerRadius } = attrs,
+	export function createGear(attrs?: ISVGGearAttrs): SVGPolygonElement {
+		const { x0, y0, radius, innerRadius, fill, fillOpacity } = attrs,
 			sectionAngle = 2 * Math.PI / attrs.count;
 		let points = "";
 
@@ -120,23 +139,20 @@ export module SVG {
 			points += ` ${topX},${topY} ${bottomX},${bottomY}`;
 		}
 
-		return <SVGPolygonElement>createElement("polygon", {
-			points,
-			fill: attrs.fill
-		});
+		return <SVGPolygonElement> createElement("polygon", { fill, points, fillOpacity });
 	}
 
 	export function createRotatedText(attrs: ISVGRotatedTextAttrs): SVGTextElement {
-		const svgTextEl: SVGTextElement = <SVGTextElement>createElement("text", {
+		const svgTextEl: SVGTextElement = <SVGTextElement> createElement("text", {
 			x: 0,
 			y: 0,
-			transform: `translate(${attrs.x} ${attrs.y}) rotate(${attrs.angle * 180 / Math.PI})`,
 			fill: attrs.fill,
-			"font-family": "Verdana",
-			"font-weight": "700",
-			"font-size": attrs.fontSize,
-			"text-anchor": "middle",
-			"alignment-baseline": "central"
+			fontSize: attrs.fontSize,
+			transform: `translate(${attrs.x} ${attrs.y}) rotate(${attrs.angle * 180 / Math.PI})`,
+			fontFamily: "Verdana",
+			fontWeight: "700",
+			textAnchor: "middle",
+			alignmentBaseline: "central"
 		});
 
 		svgTextEl.innerHTML = attrs.text;

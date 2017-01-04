@@ -167,10 +167,14 @@
 	            return {
 	                sections: [],
 	                fill: "#fafbfd",
-	                stroke: "rgba(0,0,0,.2)",
 	                wheelBorder: 1.5,
-	                sectionBorder: 0.02,
+	                sectionBorder: 0.03,
 	                innerRadius: 9.4,
+	                gears: [
+	                    [35, 0.1],
+	                    [25, 0.15],
+	                    [15, 0.2]
+	                ],
 	                textGear: {
 	                    fill: "#fafafa",
 	                    count: 20,
@@ -193,19 +197,22 @@
 	        extend(true, this, defaults, cloneOptions);
 	    };
 	    WheelView.prototype._createElement = function () {
-	        var _a = this, textGear = _a.textGear, innerRadius = _a.innerRadius, sectionBorder = _a.sectionBorder, _b = [50, 50], x0 = _b[0], y0 = _b[1], sectionAngle = 4 * Math.PI / this.sections.length, radius = x0 - this.wheelBorder, textGearDistance = radius - textGear.radius - textGear.margin, sectionOffset = {
+	        var _a = this, textGear = _a.textGear, innerRadius = _a.innerRadius, sectionBorder = _a.sectionBorder, _b = [50, 50], x0 = _b[0], y0 = _b[1], radius = x0 - this.wheelBorder, fontSize = Math.floor(textGear.innerRadius * 1.4), sectionAngle = 4 * Math.PI / this.sections.length, textGearDistance = radius - textGear.radius - textGear.margin, sectionOffset = {
 	            left: sectionBorder / 2 - sectionAngle / 4,
 	            right: sectionBorder / 2 + sectionAngle / 4
 	        }, svg = this._element = SVG_1.SVG.createSvg({
 	            width: "100%",
-	            height: "100%",
-	            viewBox: "0 0 100 100"
+	            height: "100%"
 	        });
+	        svg.setAttribute("viewBox", "0 0 100 100");
 	        svg.appendChild(SVG_1.SVG.createCircle({
 	            cx: x0,
 	            cy: y0,
 	            r: 50,
-	            fill: this.fill
+	            fill: this.fill,
+	            stroke: "#000",
+	            strokeWidth: 0.2,
+	            strokeOpacity: 0.1
 	        }));
 	        this.sections.forEach(function (section, i) {
 	            var startAngle = (i * sectionAngle - Math.PI) / 2 + sectionOffset.left, endAngle = ((i + 1) * sectionAngle - Math.PI) / 2 - sectionOffset.right, middleAngle = startAngle + (endAngle - startAngle) / 2, xMiddle = x0 + textGearDistance * Math.cos(middleAngle), yMiddle = y0 + textGearDistance * Math.sin(middleAngle), group = SVG_1.SVG.createElement("g");
@@ -227,39 +234,23 @@
 	                text: section.text,
 	                fill: section.fill,
 	                angle: middleAngle + Math.PI / 2,
-	                fontSize: Math.floor(textGear.innerRadius * 1.4),
+	                fontSize: fontSize,
 	                x: xMiddle,
 	                y: yMiddle
 	            }));
 	            svg.appendChild(group);
 	        });
-	        [35, 25, 15].forEach(function (r, i) {
-	            svg.appendChild(SVG_1.SVG.createGear(Object.assign({}, textGear, {
+	        this.gears.forEach(function (params) {
+	            svg.appendChild(SVG_1.SVG.createGear({
 	                x0: x0,
 	                y0: y0,
 	                count: 70,
-	                radius: r,
-	                innerRadius: r - 1,
-	                fill: "rgba(255, 255, 255, " + 0.1 * (i + 1) + ")"
-	            })));
+	                fill: "#fff",
+	                radius: params[0],
+	                innerRadius: params[0] - 1,
+	                fillOpacity: params[1]
+	            }));
 	        });
-	        svg.appendChild(SVG_1.SVG.createCircle({
-	            cx: x0,
-	            cy: y0,
-	            r: 50,
-	            fill: "rgba(0,0,0,0)",
-	            "stroke-width": 0.1,
-	            stroke: this.stroke
-	        }));
-	        svg.appendChild(SVG_1.SVG.createCircle({
-	            cx: x0,
-	            cy: y0,
-	            r: radius - 0.25,
-	            fill: "rgba(0,0,0,0)",
-	            "stroke-width": 0.5,
-	            "stroke-dasharray": "11 1",
-	            stroke: this.stroke
-	        }));
 	    };
 	    Object.defineProperty(WheelView.prototype, "element", {
 	        get: function () {
@@ -285,6 +276,12 @@
 	var SVG_NS = "http://www.w3.org/2000/svg", XLINK = "http://www.w3.org/1999/xlink", hasOwn = Object.hasOwnProperty;
 	var SVG;
 	(function (SVG) {
+	    var toDash = function (str) {
+	        return str.replace(toDash.regex, function (match) {
+	            return "-" + match.toLowerCase();
+	        });
+	    };
+	    toDash.regex = /([A-Z])/g;
 	    function createElement(type, attrs) {
 	        var svgEl = document.createElementNS(SVG_NS, type);
 	        setAttributes(svgEl, attrs);
@@ -298,10 +295,10 @@
 	            if (hasOwn.call(attrs, attrName)) {
 	                var attrVal = "" + attrs[attrName];
 	                if (attrName.toLowerCase() === "href") {
-	                    el.setAttributeNS(XLINK, attrName, attrVal);
+	                    el.setAttributeNS(XLINK, toDash(attrName), attrVal);
 	                }
 	                else {
-	                    el.setAttribute(attrName, attrVal);
+	                    el.setAttribute(toDash(attrName), attrVal);
 	                }
 	            }
 	        }
@@ -329,34 +326,34 @@
 	        };
 	        return createElement("path", {
 	            d: "\n\t\t\t\tM " + outer.x0 + " " + outer.y0 + "\n\t\t\t\tL " + inner.x0 + " " + inner.y0 + "\n\t\t\t\tA " + innerRadius + " " + innerRadius + " 0 0 1 " + inner.x1 + " " + inner.y1 + "\n\t\t\t\tL " + outer.x1 + " " + outer.y1 + "\n\t\t\t\tA " + radius + " " + radius + " 0 0 0 " + outer.x0 + " " + outer.y0 + " Z\n\t\t\t",
-	            fill: attrs.fill
+	            fill: attrs.fill,
+	            stroke: attrs.fill,
+	            strokeWidth: "0.6",
+	            strokeOpacity: "0.6"
 	        });
 	    }
 	    SVG.createSection = createSection;
 	    function createGear(attrs) {
-	        var x0 = attrs.x0, y0 = attrs.y0, radius = attrs.radius, innerRadius = attrs.innerRadius, sectionAngle = 2 * Math.PI / attrs.count;
+	        var x0 = attrs.x0, y0 = attrs.y0, radius = attrs.radius, innerRadius = attrs.innerRadius, fill = attrs.fill, fillOpacity = attrs.fillOpacity, sectionAngle = 2 * Math.PI / attrs.count;
 	        var points = "";
 	        for (var i = 0, l = attrs.count; i < l; i++) {
 	            var topX = +(x0 + radius * Math.cos(sectionAngle * i + sectionAngle / 2)).toFixed(2), topY = +(y0 + radius * Math.sin(sectionAngle * i + sectionAngle / 2)).toFixed(2), bottomX = +(x0 + innerRadius * Math.cos(sectionAngle * (i + 1))).toFixed(2), bottomY = +(y0 + innerRadius * Math.sin(sectionAngle * (i + 1))).toFixed(2);
 	            points += " " + topX + "," + topY + " " + bottomX + "," + bottomY;
 	        }
-	        return createElement("polygon", {
-	            points: points,
-	            fill: attrs.fill
-	        });
+	        return createElement("polygon", { fill: fill, points: points, fillOpacity: fillOpacity });
 	    }
 	    SVG.createGear = createGear;
 	    function createRotatedText(attrs) {
 	        var svgTextEl = createElement("text", {
 	            x: 0,
 	            y: 0,
-	            transform: "translate(" + attrs.x + " " + attrs.y + ") rotate(" + attrs.angle * 180 / Math.PI + ")",
 	            fill: attrs.fill,
-	            "font-family": "Verdana",
-	            "font-weight": "700",
-	            "font-size": attrs.fontSize,
-	            "text-anchor": "middle",
-	            "alignment-baseline": "central"
+	            fontSize: attrs.fontSize,
+	            transform: "translate(" + attrs.x + " " + attrs.y + ") rotate(" + attrs.angle * 180 / Math.PI + ")",
+	            fontFamily: "Verdana",
+	            fontWeight: "700",
+	            textAnchor: "middle",
+	            alignmentBaseline: "central"
 	        });
 	        svgTextEl.innerHTML = attrs.text;
 	        return svgTextEl;
