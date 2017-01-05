@@ -1,0 +1,67 @@
+@import "variables";
+
+
+html, body{
+    height: 100%;
+    overflow: hidden;
+}
+
+.app {
+    height: 100%;
+    display: flex;
+    align-items: center;
+    flex-direction: column;
+
+    .input-wrapper {
+        margin-top: 15px;
+        display: flex;
+        height: 60px;
+        font-size: 42px;
+        box-shadow: 5px 5px 22px $shadowColor;
+        border: 1px solid black;
+
+        input {
+            border: none;
+            font-size: inherit;
+            width: 135px;
+            text-align: center;
+
+            &:focus {
+                outline: none;
+            }
+        }
+
+        button {
+            margin-left: 5px;
+            background-color: black;
+            border: none;
+            color: #fafafa;
+            padding: 0 25px;
+            font-weight: 700;
+            font-size: inherit;
+        }
+    }
+
+    .pointer {
+        height: 30px;
+
+        &:after {
+            display: inline-block;
+            color: black;
+            text-shadow: 5px 5px 22px $shadowColor;
+            font-size: 44px;
+            padding: 0;
+            margin-bottom: 5px;
+        }
+    }
+
+    .wheel-view {
+        width: 40%;
+        height: 40vw;
+        padding: 5px;
+        border: 1px solid rgba(0, 0, 0, .2);
+        border-radius: 50%;
+        box-shadow: 20px 20px 44px $shadowColor;
+        user-select: none;
+    }
+}

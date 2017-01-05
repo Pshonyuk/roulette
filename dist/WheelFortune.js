@@ -63,19 +63,24 @@
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
-	var WheelView_1 = __webpack_require__(4);
-	var hasOwn = Object.hasOwnProperty;
+	var WheelView_1 = __webpack_require__(3);
+	var MAX_SPIN_VALUE = 1000, hasOwn = Object.hasOwnProperty;
+	function getRotationAngle(el) {
+	    var st = window.getComputedStyle(el, null), tr = (st.getPropertyValue("-webkit-transform") ||
+	        st.getPropertyValue("-moz-transform") ||
+	        st.getPropertyValue("-ms-transform") ||
+	        st.getPropertyValue("-o-transform") ||
+	        st.getPropertyValue("transform") || "fail"), _a = ((tr.split("(")[1] || "").split(")")[0] || "").split(","), a = _a[0], b = _a[1];
+	    return Math.round(Math.atan2(+b, +a) * (180 / Math.PI)) || 0;
+	}
+	exports.getRotationAngle = getRotationAngle;
 	var WheelFortune = (function () {
 	    function WheelFortune(params) {
 	        this.container = params.container;
-	        this.container.innerHTML = WheelFortune.getTemplate(params.wheelView.sections.length - 1);
+	        this.container.innerHTML = WheelFortune.template;
 	        this._createWheelView(params.wheelView);
 	        this._attachEvents();
 	    }
-	    WheelFortune.getTemplate = function (max) {
-	        return "\n            <div class=\"wheel-view\"></div>\n            <div class=\"input-wrapper\">\n                <input type=\"number\" value=\"0\" max=\"" + max + "\">\n                <button class=\"spin\">Spin</button>\n            </div>\n        ";
-	    };
-	    ;
 	    WheelFortune.prototype._createWheelView = function (params) {
 	        this.container
 	            .querySelector(".wheel-view")
@@ -84,7 +89,7 @@
 	    WheelFortune.prototype._attachEvents = function () {
 	        this._eventsList = [];
 	        var eventsDescription = {
-	            "click .spin": this._spin
+	            "click .spin": this._spinAction
 	        };
 	        for (var key in eventsDescription) {
 	            if (hasOwn.call(eventsDescription, key)) {
@@ -98,9 +103,16 @@
 	        this._eventsList.forEach(function (eventData) {
 	            eventData.target.removeEventListener(eventData.type, eventData.handler);
 	        });
+	        this._eventsList = null;
 	    };
-	    WheelFortune.prototype._spin = function () {
-	        console.log("click");
+	    WheelFortune.prototype._spinAction = function () {
+	        var spinValueEl = this.container.querySelector(".spin-value");
+	        this.spin(+spinValueEl.value);
+	    };
+	    WheelFortune.prototype.spin = function (count) {
+	        var sectionAngle = 360 / this._wheelView.sections.length, wheelEl = this.container.querySelector(".wheel-view svg");
+	        count = Math.min(Math.max(+count || 0, 0), MAX_SPIN_VALUE);
+	        wheelEl.style.transform = "rotate(" + (getRotationAngle(wheelEl) + sectionAngle * count) + "deg)";
 	    };
 	    WheelFortune.prototype.destroy = function () {
 	        this._detachEvents();
@@ -109,17 +121,17 @@
 	    };
 	    return WheelFortune;
 	}());
+	WheelFortune.template = "\n        <div class=\"input-wrapper\">\n            <input class=\"spin-value\" type=\"number\" value=\"10\" max=\"" + MAX_SPIN_VALUE + "\">\n            <button class=\"spin\">Spin</button>\n        </div>\n        <span class=\"pointer\">\u25BC</span>\n        <div class=\"wheel-view\"></div>\n    ";
 	exports.WheelFortune = WheelFortune;
 
 
 /***/ },
-/* 3 */,
-/* 4 */
+/* 3 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
-	var SVG_1 = __webpack_require__(5);
-	var extend = __webpack_require__(6), hasOwn = Object.hasOwnProperty;
+	var SVG_1 = __webpack_require__(4);
+	var extend = __webpack_require__(5), hasOwn = Object.hasOwnProperty;
 	var WheelView = (function () {
 	    function WheelView(options) {
 	        this._readOptions(options);
@@ -233,7 +245,7 @@
 
 
 /***/ },
-/* 5 */
+/* 4 */
 /***/ function(module, exports) {
 
 	"use strict";
@@ -334,7 +346,7 @@
 
 
 /***/ },
-/* 6 */
+/* 5 */
 /***/ function(module, exports) {
 
 	'use strict';
